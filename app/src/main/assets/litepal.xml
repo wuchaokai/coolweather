@@ -1,0 +1,9 @@
+<litepal>
+    <dbname value="coolweather"/>
+    <verson value="1"/>
+    <list>
+        <mapping class="com.example.aa.coolweather.db.Province"/>
+        <mapping class="com.example.aa.coolweather.db.City"/>
+        <mapping class="com.example.aa.coolweather.db.Country"/>
+    </list>
+</litepal>
