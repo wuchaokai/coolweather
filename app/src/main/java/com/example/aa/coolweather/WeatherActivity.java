@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -41,14 +44,32 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView sportText;
     private LinearLayout forecastLayout;
     private LinearLayout aqiLayout;
-    private Button button;
+    private Button navButton;
     private ImageView bingPicImg;
+    public SwipeRefreshLayout swipeRefresh;
+    public DrawerLayout drawerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
         bingPicImg=(ImageView)findViewById(R.id.bing_pic_img);
         loadBingPic();
+        swipeRefresh=(SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
+        swipeRefresh.setColorSchemeResources(R.color.colorAccent);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestWeather(getIntent().getStringExtra("weather_id"));
+            }
+        });
+        drawerLayout=(DrawerLayout)findViewById(R.id.drawerLayout);
+        navButton=(Button)findViewById(R.id.nav_button);
+        navButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
         weatherLayout=(ScrollView)findViewById(R.id.weather_layout);
         tittleCity=(TextView)findViewById(R.id.tittle_city);
         tittleUpdateTime=(TextView)findViewById(R.id.tittle_update_time);
@@ -61,13 +82,7 @@ public class WeatherActivity extends AppCompatActivity {
         sportText=(TextView)findViewById(R.id.sport_text);
         forecastLayout=(LinearLayout)findViewById(R.id.forecast_layout);
         aqiLayout=(LinearLayout)findViewById(R.id.aqi_layout);
-        button=(Button)findViewById(R.id.back_button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+
         aqiLayout.setVisibility(View.GONE);
         String weatherId=getIntent().getStringExtra("weather_id");
         weatherLayout.setVisibility(View.INVISIBLE);
@@ -106,6 +121,7 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_SHORT).show();
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -122,6 +138,7 @@ public class WeatherActivity extends AppCompatActivity {
                             showWeatherInfo(weather);
                         }
                         else Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_SHORT).show();
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
